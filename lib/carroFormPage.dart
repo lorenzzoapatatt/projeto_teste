@@ -140,6 +140,8 @@ class _TarefaFormPageState extends State<CarroFormPage> {
       );
 
       if (context.mounted) Navigator.pop(context);
+
+      Navigator.of(context).pop();
     }
   }
 }

@@ -25,6 +25,7 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
   }
 
+
   Future<void> _getTarefas() async {
 
     setState(() {
@@ -42,6 +43,7 @@ class _MyHomePageState extends State<MyHomePage> {
     var listData = response.data;
     for (var data in listData) {
       var tarefa = Carro(
+        id: data['id'],
         preco: data['preco'],
         nome: data['nome'],
         tipo: data['tipo']
@@ -84,7 +86,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 Text("Preço: ${carros[index].preco}"),
               ],
             ),
-            trailing: Icon(Icons.arrow_right_alt_outlined),
+            trailing: IconButton(
+              icon: Icon(Icons.delete_outlined),
+              onPressed: () => _onPressedDeleteButton(carros[index].id),
+            ),
           );
         },
       ),
@@ -115,5 +120,42 @@ class _MyHomePageState extends State<MyHomePage> {
     // });
     // controllerTitulo.clear();
     // controllerDescricao.clear();
+
+    
   }
+  void _onPressedDeleteButton(String id) async{
+    showDialog(context: context, builder: (_){
+      return AlertDialog(
+        title: Text("Deletar registro"),
+        content: Text("Deseja deletar este registro?"),
+        actions: [
+          TextButton(onPressed: () {
+            Navigator.of(context).pop();
+          }, child: Text("Cancelar"),),
+          ElevatedButton(onPressed: () {
+            _excluirTarefa(id);
+          }, child: Text("Deletar")),
+        ],
+      );
+    });
+  }
+  
+      void _excluirTarefa(String id) async {
+        var dio = Dio(
+          BaseOptions(
+            connectTimeout: Duration(seconds: 30),
+            baseUrl: 'https://6912661a52a60f10c82189db.mockapi.io/api/v1',
+          ),
+        );
+        var response = await dio.delete('/tarefa?$id');
+        if (response.statusCode == 200) {
+
+        }else {
+          if (!context.mounted) return;
+          Navigator.pop(context);
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text("Erro ao excluir")));
+        }
+      }
 }
