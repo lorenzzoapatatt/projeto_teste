@@ -32,6 +32,8 @@ class _MyHomePageState extends State<MyHomePage> {
       isLoading = true;
     });
 
+carros.clear();
+
     var dio = Dio(
       BaseOptions(
         connectTimeout: Duration(seconds: 30),
@@ -86,9 +88,18 @@ class _MyHomePageState extends State<MyHomePage> {
                 Text("Preço: ${carros[index].preco}"),
               ],
             ),
-            trailing: IconButton(
-              icon: Icon(Icons.delete_outlined),
-              onPressed: () => _onPressedDeleteButton(carros[index].id),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: Icon(Icons.edit_outlined), // botão de EDITAR
+                  onPressed: () => _onPressedEditButton(carros[index].id),
+                ),
+                IconButton(
+                  icon: Icon(Icons.delete_outlined), // botão de EXCLUIR
+                  onPressed: () => _onPressedDeleteButton(carros[index].id),
+                ),
+              ],
             ),
           );
         },
@@ -147,9 +158,47 @@ class _MyHomePageState extends State<MyHomePage> {
             baseUrl: 'https://6912661a52a60f10c82189db.mockapi.io/api/v1',
           ),
         );
-        var response = await dio.delete('/tarefa?$id');
+        var response = await dio.delete('/carros/$id');
         if (response.statusCode == 200) {
+          Navigator.of(context).pop();
+          _getTarefas();
+        }else {
+          if (!context.mounted) return;
+          Navigator.pop(context);
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text("Erro ao excluir")));
+        }
+      }
 
+  void _onPressedEditButton(String id) async{
+    showDialog(context: context, builder: (_){
+      return AlertDialog(
+        title: Text("Editar registro"),
+        content: Text("Deseja editar este registro?"),
+        actions: [
+          TextButton(onPressed: () {
+            Navigator.of(context).pop();
+          }, child: Text("Cancelar"),),
+          ElevatedButton(onPressed: () {
+            _editarTarefa(id);
+          }, child: Text("Editar")),
+        ],
+      );
+    });
+  }
+
+      void _editarTarefa(String id) async {
+        var dio = Dio(
+          BaseOptions(
+            connectTimeout: Duration(seconds: 30),
+            baseUrl: 'https://6912661a52a60f10c82189db.mockapi.io/api/v1',
+          )
+        );
+        var response = await dio.put('/carros/$id');
+        if (response.statusCode == 200) {
+          Navigator.of(context).pop();
+          _getTarefas();
         }else {
           if (!context.mounted) return;
           Navigator.pop(context);
