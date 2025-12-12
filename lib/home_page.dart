@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:projeto_teste/carroFormPage.dart';
 import 'package:projeto_teste/model/carro.dart';
+import 'package:projeto_teste/carro_edit_page.dart';
+
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title, required this.subtitle});
@@ -188,23 +190,21 @@ carros.clear();
     });
   }
 
-      void _editarTarefa(String id) async {
-        var dio = Dio(
-          BaseOptions(
-            connectTimeout: Duration(seconds: 30),
-            baseUrl: 'https://6912661a52a60f10c82189db.mockapi.io/api/v1',
+      void _editarTarefa(String id) {
+      // fecha o AlertDialog antes de abrir a tela
+      Navigator.of(context).pop();
+
+      Navigator.of(context)
+          .push(
+            MaterialPageRoute(
+              builder: (_) => CarroEditPage(id: id),
+            ),
           )
-        );
-        var response = await dio.put('/carros/$id');
-        if (response.statusCode == 200) {
-          Navigator.of(context).pop();
-          _getTarefas();
-        }else {
-          if (!context.mounted) return;
-          Navigator.pop(context);
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text("Erro ao excluir")));
-        }
-      }
+          .then((editou) {
+            if (editou == true) {
+              _getTarefas();
+            }
+          });
+    }
+
 }
