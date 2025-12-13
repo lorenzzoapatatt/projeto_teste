@@ -191,7 +191,6 @@ carros.clear();
   }
 
       void _editarTarefa(String id) {
-      // fecha o AlertDialog antes de abrir a tela
       Navigator.of(context).pop();
 
       Navigator.of(context)
